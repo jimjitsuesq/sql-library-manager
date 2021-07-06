@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
+var indexRouter = require('./routes/index.old');
 var usersRouter = require('./routes/users');
 
 var app = express();
@@ -50,20 +50,35 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-// catch 404 and forward to error handler
+/**
+ * Catches 404 errors outside of defined routes and forwards to the global
+ * error handler
+ */
 app.use(function(req, res, next) {
-  next(createError(404));
+  console.log('404 error handler called');
+  const err = new Error();
+    err.status = 404;
+    err.message = "Looks like the page you reqested doesn't exist."
+    next(err);
 });
 
-// error handler
+/**
+ * Global error handler
+ */
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  if (err) {
+    console.log('Global error handler called', err);
+  }
+  if (err.status === 404) {
+    res.status(404).render('page-not-found', { err })
+  } else {
+    res.status(500).render('error', { err });
+    console.log(err.message)
+    console.log(err.status)
+  }
 });
 
 module.exports = app;

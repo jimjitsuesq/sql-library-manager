@@ -2,5 +2,6 @@ extends layout
 
 block content 
   h1= title
-  p Sorry! We couldn't find the page you were looking for.
+  p= err.message
+  //Sorry! We couldn't find the page you were looking for.
   a(class='button' href='books') Home

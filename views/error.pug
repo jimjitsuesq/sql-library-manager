@@ -1,6 +1,6 @@
 extends layout
 
 block content
-  h1= message
-  h2= error.status
+  h1 Server Error
+  h2= `Oops! Something went wrong! Error Code: ` + error.status
   pre #{error.stack}
