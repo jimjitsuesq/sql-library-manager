@@ -9,27 +9,33 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize ({
-  dialect: 'sqlite',
-  storage: 'library.db'
-});
+// const { Sequelize } = require('sequelize');
+// const sequelize = new Sequelize ({
+//   dialect: 'sqlite',
+//   storage: 'library.db'
+// });
 
-const db = require('./models');
+let db = require('./models').sequelize;
 // const { Books } = db.models;
 
 (async () => {
   try {
-    await sequelize.authenticate();
+    await db.authenticate();
     console.log('Connection to the database successful!');
   } catch (error) {
-    console.error('Error connecting to the database: ', error);
+    console.log('Error connecting to the database: ', error);
   }
 })();
 
 (async () => {
-  await db.sequelize.sync({ force: true });
-});
+  try {
+    await db.sync();
+    console.log('Synced!')
+  }
+  catch (error) {
+    console.log('Sync error!')
+  }
+})();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
