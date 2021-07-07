@@ -25,8 +25,8 @@ a.button, input[type=submit] {
   cursor: pointer;
 }
 
-form a.button, input[type=submit] {
-  margin-left: 10px;
+a.button, input[type=submit] {
+  margin-left: 5px;
   transition: 0.4s;
 }
 

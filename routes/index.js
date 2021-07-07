@@ -4,7 +4,21 @@ const Book = require('../models').Book;
 const { Op } = require('sequelize');
 
 /**
- * Redirect root address to main display for all books
+ * Pagination helper function
+ */
+
+const paginate = ({ page, pageSize }) => {
+  const offset = page * pageSize;
+  const limit = pageSize;
+
+  return {
+    offset,
+    limit,
+  };
+};
+
+/**
+ * Redirect root address to /books
  */
 
  router.get('/', async (req, res) => {
@@ -12,27 +26,56 @@ const { Op } = require('sequelize');
 });
 
 /**
- * Main route handler that handles initial display of all books, as well as
- * all Search routes
+ * Main route handler that handles initial display of all books nd all searches
  */
 
  router.get('/books', async(req, res) => {
   let search = (req.query.search);
+  let page = parseInt(req.query.page) || 1
+  let limit = 5;
+  let offset = 0;
+  let nextPage;
+  let previousPage;
+  let pages;
   if (search !== undefined) {
-    const books = await Book.findAll({
+    const allBooks = await Book.findAndCountAll({
       where: {
         [Op.or]: [
-        {title: {[Op.substring]: search}},
-        {author: {[Op.substring]: search}},
-        {genre: {[Op.substring]: search}},
-        {year: {[Op.eq]: search}}
+          {title: {[Op.substring]: search}},
+          {author: {[Op.substring]: search}},
+          {genre: {[Op.substring]: search}},
+          {year: {[Op.eq]: search}}
         ]
       }
     });
-    res.render("search-results", {books, search} )
-  } else {
-    const books = await Book.findAll();
-    res.render("index", {books, title: "Books"} )
+    pages = Math.ceil(allBooks.count / limit);
+    offset = limit * (page - 1);
+    nextPage = parseInt(page) + 1;
+    previousPage = parseInt(page) - 1;
+    const books = await Book.findAll({
+      where: {
+        [Op.or]: [
+          {title: {[Op.substring]: search}},
+          {author: {[Op.substring]: search}},
+          {genre: {[Op.substring]: search}},
+          {year: {[Op.eq]: search}}
+        ]
+      },
+      offset: offset,
+      limit: limit,
+    })
+    res.render("search-results", {books, search, page, nextPage, previousPage, pages} )
+  } else {  
+    const allBooks = await Book.findAndCountAll({offset, limit})
+      pages = Math.ceil(allBooks.count / limit);
+      offset = limit * (page - 1);
+      nextPage = parseInt(page) + 1;
+      previousPage = parseInt(page) - 1;
+    const books = await Book.findAll({
+      offset: offset,
+      limit: limit,
+    })
+    res.render("index", {books, title: "Books", page, nextPage, previousPage, pages} )
   }
 });
 

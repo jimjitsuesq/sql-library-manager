@@ -9,15 +9,22 @@ block content
             th Author 
             th Genre 
             th Year
-        for  book in  books
+        for book in books
             tr 
-            td 
-                a(href=`books/${ book.id}`) !{ book.title}
+                td 
+                    a(href=`../../books/${ book.id}`) !{ book.title}
 
-            td=  book.author
+                td=  book.author
 
-            td=  book.genre 
+                td=  book.genre 
 
-            td=  book.year
+                td=  book.year
     p
-    a(class='button' href='../books') Back
+    p Page #{page} of #{pages}
+    p
+    if (page !== 1)
+        a(class='button' href=`../../books?search=${search}&page=${previousPage}`) Previous Page
+    if (page !== pages)
+        a(class='button' href=`../../books?search=${search}&page=${nextPage}`) Next Page
+    p
+    a(class='button' href='../../books') Back

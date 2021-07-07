@@ -16,7 +16,7 @@ block content
     for book in books
       tr 
         td 
-          a(href=`books/${book.id}`) !{book.title}
+          a(href=`../../books/${book.id}`) !{book.title}
 
         td= book.author
 
@@ -24,4 +24,11 @@ block content
 
         td= book.year
   p
-  a(class='button' href='books/new') Create New Book
+  p Page #{page} of #{pages}
+  p
+  if (page !== 1)
+    a(class='button' href=`../../books?page=${previousPage}`) Previous Page
+  if (page !== pages)
+    a(class='button' href=`../../books?page=${nextPage}`) Next Page
+  p
+  a(class='button' href='../../books/new') Create New Book
