@@ -1,6 +1,11 @@
 extends layout 
 
 block content 
+    if(errors)
+        h2.errors.error Oops an error occurred!
+        ul.errors.error
+            each error in errors
+                li= error.message
     h1= title 
     form(method='POST')
         p 
@@ -18,4 +23,4 @@ block content
         p
         input(type='submit' value='Create New Book')
         p 
-        a(class='button' href='books') Cancel
+        a(class='button' href='../books') Cancel

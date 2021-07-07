@@ -4,19 +4,11 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index.old');
+var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
 var app = express();
 
-// const { Sequelize } = require('sequelize');
-// const sequelize = new Sequelize ({
-//   dialect: 'sqlite',
-//   storage: 'library.db'
-// });
-
 let db = require('./models').sequelize;
-// const { Books } = db.models;
 
 (async () => {
   try {
@@ -36,6 +28,8 @@ let db = require('./models').sequelize;
     console.log('Sync error!')
   }
 })();
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -73,7 +67,7 @@ app.use(function(err, req, res, next) {
     console.log('Global error handler called', err);
   }
   if (err.status === 404) {
-    res.status(404).render('page-not-found', { err })
+    res.status(404).render('page-not-found', { err, title:"Not Found" })
   } else {
     res.status(500).render('error', { err });
     console.log(err.message)

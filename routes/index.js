@@ -1,22 +1,39 @@
 var express = require('express');
 var router = express.Router();
 const Book = require('../models').Book;
+const { Op } = require('sequelize');
 
 /**
  * Redirect root address to main display for all books
  */
 
-router.get('/', async (req, res) => {
+ router.get('/', async (req, res) => {
   res.redirect('/books')
 });
 
 /**
- * Main page that displays a list of all books in the DB
+ * Main route handler that handles initial display of all books, as well as
+ * all Search routes
  */
 
-router.get('/books', async (req, res) => {
-  const books = await Book.findAll();
-  res.render("index", {books, title: "Books"} )
+ router.get('/books', async(req, res) => {
+  let search = (req.query.search);
+  if (search !== undefined) {
+    const books = await Book.findAll({
+      where: {
+        [Op.or]: [
+        {title: {[Op.substring]: search}},
+        {author: {[Op.substring]: search}},
+        {genre: {[Op.substring]: search}},
+        {year: {[Op.eq]: search}}
+        ]
+      }
+    });
+    res.render("search-results", {books, search} )
+  } else {
+    const books = await Book.findAll();
+    res.render("index", {books, title: "Books"} )
+  }
 });
 
 /**
@@ -48,10 +65,10 @@ router.post('/books/new', async (req, res) => {
   let book;
   try {
     book = await Book.create(req.body);
-    res.redirect("/books");
+    res.redirect("../books");
   } catch (error) {
     if(error.name === "SequelizeValidationError") {
-      book = await Book.build();
+      book = await Book.build(req.body);
       res.render("new-book", {book, errors: error.errors, title: "New Book"})
     } else {
       throw error;
@@ -85,7 +102,7 @@ router.post('/books/:id', async (req, res) => {
     book = await Book.findByPk(req.params.id);
     if(book) {
       await book.update(req.body);
-      res.redirect("/books"); 
+      res.redirect("../books"); 
     } else {
       res.sendStatus(404);
     }

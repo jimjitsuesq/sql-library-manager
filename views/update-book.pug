@@ -1,6 +1,11 @@
 extends layout 
 
-block content 
+block content
+    if(errors)
+        h2.errors.error Oops an error occurred!
+        ul.errors.error
+            each error in errors
+                li= error.message
     h1= title 
     form(method='POST')
         p 

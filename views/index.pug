@@ -2,7 +2,10 @@ extends layout
 
 block content
   h1= title
-  a(class='button' href='books/new') Create New Book
+  p
+  form(method='GET')
+    input(type='text', name='search', id='search')
+    input(type='submit', value='Search Books')
   p
   table
     tr 
@@ -20,3 +23,5 @@ block content
         td= book.genre 
 
         td= book.year
+  p
+  a(class='button' href='books/new') Create New Book
