@@ -4,20 +4,6 @@ const Book = require('../models').Book;
 const { Op } = require('sequelize');
 
 /**
- * Pagination helper function
- */
-
-const paginate = ({ page, pageSize }) => {
-  const offset = page * pageSize;
-  const limit = pageSize;
-
-  return {
-    offset,
-    limit,
-  };
-};
-
-/**
  * Redirect root address to /books
  */
 
@@ -26,19 +12,19 @@ const paginate = ({ page, pageSize }) => {
 });
 
 /**
- * Main route handler that handles initial display of all books nd all searches
+ * Main route handler that handles initial display of all books and all searches
  */
 
  router.get('/books', async(req, res) => {
   let search = (req.query.search);
-  let page = parseInt(req.query.page) || 1
+  let page = parseInt(req.query.page) || 1;
   let limit = 5;
   let offset = 0;
   let nextPage;
   let previousPage;
   let pages;
   if (search !== undefined) {
-    const allBooks = await Book.findAndCountAll({
+    const searchBooks = await Book.findAndCountAll({
       where: {
         [Op.or]: [
           {title: {[Op.substring]: search}},
@@ -48,10 +34,10 @@ const paginate = ({ page, pageSize }) => {
         ]
       }
     });
-    pages = Math.ceil(allBooks.count / limit);
+    pages = Math.ceil(searchBooks.count / limit);
     offset = limit * (page - 1);
-    nextPage = parseInt(page) + 1;
-    previousPage = parseInt(page) - 1;
+    nextPage = page + 1;
+    previousPage = page - 1;
     const books = await Book.findAll({
       where: {
         [Op.or]: [
@@ -67,10 +53,10 @@ const paginate = ({ page, pageSize }) => {
     res.render("search-results", {books, search, page, nextPage, previousPage, pages} )
   } else {  
     const allBooks = await Book.findAndCountAll({offset, limit})
-      pages = Math.ceil(allBooks.count / limit);
-      offset = limit * (page - 1);
-      nextPage = parseInt(page) + 1;
-      previousPage = parseInt(page) - 1;
+    pages = Math.ceil(allBooks.count / limit);
+    offset = limit * (page - 1);
+    nextPage = page + 1;
+    previousPage = page - 1;
     const books = await Book.findAll({
       offset: offset,
       limit: limit,
@@ -85,7 +71,6 @@ const paginate = ({ page, pageSize }) => {
 
  router.get('/error', (req, res, next) => {
   console.log('Custom error route called');
-
   const err = new Error();
   err.status = 500;
   err.message = `Custom 500 error thrown`

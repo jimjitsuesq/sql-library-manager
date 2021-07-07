@@ -49,9 +49,9 @@ app.use('/users', usersRouter);
 app.use(function(req, res, next) {
   console.log('404 error handler called');
   const err = new Error();
-    err.status = 404;
-    err.message = "Looks like the page you reqested doesn't exist."
-    next(err);
+  err.status = 404;
+  err.message = "Looks like the page you reqested doesn't exist."
+  next(err);
 });
 
 /**
